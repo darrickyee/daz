@@ -1,9 +1,17 @@
-from daz.skeletons import SKEL_FULL, SKEL_HALF, TREE_FULL, TREE_HALF, JOINT_MAP
-from daz.figures import loadMeshes
-from daz.core import TargetMesh
-import pymel.core as pm
+import os
 import sys
-sys.path.append("C:/Users/DSY/Documents/Maya/2018/scripts/daz")
+import pymel.core as pm
+from .core import TargetMesh
+from .figures import loadMeshes
+from .skeletons import BaseSkeleton, JOINT_MAP
+
+bs = BaseSkeleton()
+SKEL_HALF = bs.joint_names
+TREE_HALF = bs.joint_tree
+ORIENT_GRPS = bs.orient_grps
+WORLDORIENT_JNTS = bs.manual_orients
+TWIST_JNTS = bs.twist_joints
+MANUAL_XFORMS = bs.manual_xforms
 
 TGT_BODY = {
     'name': 'Body',
@@ -42,36 +50,6 @@ def execTransfer():
     pm.mel.eval('cleanUpScene 3')
 
     return tgt_obj
-
-
-MIRROR_JOINT_LIST = [joint_name for joint_name in SKEL_HALF if joint_name[-2:]
-                     == '_R' and joint_name[0:3] != 'Eye']
-CENTER_JOINT_LIST = [
-    joint_name for joint_name in JOINT_MAP if joint_name[-2:] == '_M']
-
-
-def buildSkeleton():
-    joint_dict = {jnt: pm.ls(
-        JOINT_MAP[jnt])[0] for jnt in SKEL_HALF if jnt in JOINT_MAP and pm.ls(JOINT_MAP[jnt])}
-    joints = {jntname: pm.createNode('joint', n=jntname)
-              for jntname in SKEL_HALF}
-
-    for j in joint_dict:
-        joints[j].setTranslation(
-            joint_dict[j].getTranslation(space='world'), space='world')
-            
-        if j == 'Spine1_M':
-            joints[j].setTranslation(joints['COG_M'].getTranslation(space='world') + (0, 1, 0), space='world')
-
-    for j in joints:
-        if TREE_HALF[j]:
-            joints[j].setParent(joints[TREE_HALF[j]])
-            print('Parented {0} to {1}'.format(j, joints[TREE_HALF[j]]))
-
-    free_joints = [joint for joint in joints if joint not in joint_dict]
-
-    for j in free_joints:
-        joints[j].setTranslation([0, 0, 0])
 
 
 # STILL NOT RIGHT - FIX THIS

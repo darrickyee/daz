@@ -1,2 +1,2 @@
-from .base import SKEL_FULL, SKEL_HALF, TREE_FULL, TREE_HALF
+from .base import BaseSkeleton
 from .daz import JOINT_MAP

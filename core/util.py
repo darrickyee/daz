@@ -1,6 +1,42 @@
 import pymel.core as pm
 
 
+def getPoleVector(start, mid, end):
+    """
+    Returns a unit pole vector for `start`, `mid`, and `end` transforms.
+    The pole vector is (parallel to) the vector orthogonal to the vector 
+    between `start` and `end` that passes through `mid`.
+    (Note that `start` and `end` are interchangeable.)
+
+    Parameters
+    ----------
+    start : pm.nodetypes.Transform
+
+    mid : pm.nodetypes.Transform
+
+    end : pm.nodetypes.Transform
+
+
+    Returns
+    -------
+    pm.datatypes.Vector
+
+    """
+
+    locs = [xform.getTranslation(space='world') for xform in [start, mid, end]]
+    vec_basen = (locs[2] - locs[0]).normal()
+    vec_mid = (locs[1] - locs[0])
+    pole_vec = (vec_mid - vec_mid.dot(vec_basen)*vec_basen).normal()
+
+    return pole_vec
+
+
+def orientJoint(joint, target, aim_vector=(1, 0, 0), up_vector=(0, 1, 0), world_up=(0, 1, 0)):
+    pm.delete(pm.aimConstraint(target, joint, aimVector=aim_vector,
+                               upVector=up_vector, worldUpVector=world_up))
+    pm.makeIdentity(joint, apply=True)
+
+
 def duplicateClean(src_mesh, name=None):
     """
     Creates a "clean" duplicate of an input mesh

@@ -1,4 +1,39 @@
 
+ORIENT_GRPS = [
+    ['Clavicle_R', 'Shoulder_R', 'Elbow_R', 'Wrist_R'],
+    ['Wrist_R', 'FingerMiddle1_R', 'FingerMiddle2_R', 'FingerMiddle3_R'],
+    ['FingerThumb1_R', 'FingerThumb2_R', 'FingerThumb3_R'],
+    ['FingerIndex1_R', 'FingerIndex2_R', 'FingerIndex3_R'],
+    ['FingerRing1_R', 'FingerRing2_R', 'FingerRing3_R'],
+    ['FingerPinky1_R', 'FingerPinky2_R', 'FingerPinky3_R'],
+    ['Hip_R', 'Knee_R', 'Ankle_R', 'Toes_R'],
+    ['Spine1_M', 'Spine2_M', 'Spine3_M', 'Chest_M', 'Neck_M', 'Head_M'],
+    ['Breast_R', 'BreastEnd_R'],
+    ['Toes_R'], ['ToesEnd_R'],
+    ['Eye_R', 'EyeEnd_R'],
+    ['Jaw_M', 'JawEnd_M']
+]
+
+MANUAL_ORIENTS = {
+    'COG_M': {},
+    'Head_M': {},
+    'Ankle_R': {'up_obj_name': 'Toes_R'}
+}
+
+TWIST_JNTS = [
+    'Shoulder_R',
+    'Elbow_R',
+    'Hip_R'
+]
+
+MANUAL_XFORMS = {
+    'EyeEnd_R': (0, 0, 1),
+    'HeadEnd_M': (0, 10, 0),
+    'ToesEnd_R': (0, 0, 2),
+    'BreastEnd_R': (-2, 0, 10),
+    'Heel_R': (0, -5, 0)
+}
+
 SKEL_FULL = ['Root_M',
              'COG_M',
              'Spine1_M',
@@ -25,23 +60,18 @@ SKEL_FULL = ['Root_M',
              'FingerThumb1_R',
              'FingerThumb2_R',
              'FingerThumb3_R',
-             'FingerThumbEnd_R',
              'FingerIndex1_R',
              'FingerIndex2_R',
              'FingerIndex3_R',
-             'FingerIndexEnd_R',
              'FingerMiddle1_R',
              'FingerMiddle2_R',
              'FingerMiddle3_R',
-             'FingerMiddleEnd_R',
              'FingerRing1_R',
              'FingerRing2_R',
              'FingerRing3_R',
-             'FingerRingEnd_R',
              'FingerPinky1_R',
              'FingerPinky2_R',
              'FingerPinky3_R',
-             'FingerPinkyEnd_R',
              'Eye_R',
              'EyeEnd_R',
              'Hip_L',
@@ -59,23 +89,18 @@ SKEL_FULL = ['Root_M',
              'FingerThumb1_L',
              'FingerThumb2_L',
              'FingerThumb3_L',
-             'FingerThumbEnd_L',
              'FingerIndex1_L',
              'FingerIndex2_L',
              'FingerIndex3_L',
-             'FingerIndexEnd_L',
              'FingerMiddle1_L',
              'FingerMiddle2_L',
              'FingerMiddle3_L',
-             'FingerMiddleEnd_L',
              'FingerRing1_L',
              'FingerRing2_L',
              'FingerRing3_L',
-             'FingerRingEnd_L',
              'FingerPinky1_L',
              'FingerPinky2_L',
              'FingerPinky3_L',
-             'FingerPinkyEnd_L',
              'Eye_L',
              'EyeEnd_L']
 
@@ -107,23 +132,18 @@ TREE_FULL = {'Root_M': None,
              'FingerThumb1_R': 'Wrist_R',
              'FingerThumb2_R': 'FingerThumb1_R',
              'FingerThumb3_R': 'FingerThumb2_R',
-             'FingerThumbEnd_R': 'FingerThumb3_R',
              'FingerIndex1_R': 'Wrist_R',
              'FingerIndex2_R': 'FingerIndex1_R',
              'FingerIndex3_R': 'FingerIndex2_R',
-             'FingerIndexEnd_R': 'FingerIndex3_R',
              'FingerMiddle1_R': 'Wrist_R',
              'FingerMiddle2_R': 'FingerMiddle1_R',
              'FingerMiddle3_R': 'FingerMiddle2_R',
-             'FingerMiddleEnd_R': 'FingerMiddle3_R',
              'FingerRing1_R': 'Wrist_R',
              'FingerRing2_R': 'FingerRing1_R',
              'FingerRing3_R': 'FingerRing2_R',
-             'FingerRingEnd_R': 'FingerRing3_R',
              'FingerPinky1_R': 'Wrist_R',
              'FingerPinky2_R': 'FingerPinky1_R',
              'FingerPinky3_R': 'FingerPinky2_R',
-             'FingerPinkyEnd_R': 'FingerPinky3_R',
              'Eye_R': 'Head_M',
              'EyeEnd_R': 'Eye_R',
              'Hip_L': 'COG_M',
@@ -141,25 +161,32 @@ TREE_FULL = {'Root_M': None,
              'FingerThumb1_L': 'Wrist_L',
              'FingerThumb2_L': 'FingerThumb1_L',
              'FingerThumb3_L': 'FingerThumb2_L',
-             'FingerThumbEnd_L': 'FingerThumb3_L',
              'FingerIndex1_L': 'Wrist_L',
              'FingerIndex2_L': 'FingerIndex1_L',
              'FingerIndex3_L': 'FingerIndex2_L',
-             'FingerIndexEnd_L': 'FingerIndex3_L',
              'FingerMiddle1_L': 'Wrist_L',
              'FingerMiddle2_L': 'FingerMiddle1_L',
              'FingerMiddle3_L': 'FingerMiddle2_L',
-             'FingerMiddleEnd_L': 'FingerMiddle3_L',
              'FingerRing1_L': 'Wrist_L',
              'FingerRing2_L': 'FingerRing1_L',
              'FingerRing3_L': 'FingerRing2_L',
-             'FingerRingEnd_L': 'FingerRing3_L',
              'FingerPinky1_L': 'Wrist_L',
              'FingerPinky2_L': 'FingerPinky1_L',
              'FingerPinky3_L': 'FingerPinky2_L',
-             'FingerPinkyEnd_L': 'FingerPinky3_L',
              'Eye_L': 'Head_M',
              'EyeEnd_L': 'Eye_L'}
 
 TREE_HALF = {child: TREE_FULL[child]
              for child in TREE_FULL if child[-2:] in ['_R', '_M']}
+
+
+class BaseSkeleton(object):
+
+    def __init__(self):
+
+        self.joint_names = SKEL_HALF
+        self.joint_tree = TREE_HALF
+        self.orient_grps = ORIENT_GRPS
+        self.manual_orients = MANUAL_ORIENTS
+        self.twist_joints = TWIST_JNTS
+        self.manual_xforms = MANUAL_XFORMS
