@@ -1,6 +1,10 @@
 import pymel.core as pm
 
 
+def getRootsInSet(joints):
+    return [joint for joint in joints if joint.getParent() not in joints]
+
+
 def getPoleVector(start, mid, end):
     """
     Returns a unit pole vector for `start`, `mid`, and `end` transforms.

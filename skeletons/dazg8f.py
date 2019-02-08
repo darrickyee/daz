@@ -1,14 +1,20 @@
 
 JOINT_MAP = {'COG_M': 'hip',
+             'Pelvis_M': 'pelvis',
              'Spine1_M': 'abdomenLower',
              'Spine2_M': 'abdomenUpper',
              'Spine3_M': 'chestLower',
-             'Chest_M': 'chestUpper',
+             'Spine4_M': 'chestUpper',
              'Neck_M': 'neckLower',
              'Head_M': 'head',
              'HeadEnd_M': '',
              'Jaw_M': 'lowerJaw',
              'JawEnd_M': 'Chin',
+             'Tongue1_M': 'tongue01',
+             'Tongue2_M': 'tongue02',
+             'Tongue3_M': 'tongue03',
+             'Tongue4_M': 'tongue04',
+             'TongueEnd_M': '',
              'Hip_R': 'rThighBend',
              'Knee_R': 'rShin',
              'Ankle_R': 'rFoot',
@@ -41,35 +47,26 @@ JOINT_MAP = {'COG_M': 'hip',
              'FingerPinkyEnd_R': '',
              'Eye_R': 'rEye',
              'EyeEnd_R': '',
-             'Hip_L': 'lThighBend',
-             'Knee_L': 'lShin',
-             'Ankle_L': 'lFoot',
-             'Toes_L': 'lToe',
-             'ToesEnd_L': '',
-             'Breast_L': 'lPectoral',
-             'Clavicle_L': 'lCollar',
-             'Shoulder_L': 'lShldrBend',
-             'Elbow_L': 'lForearmBend',
-             'Wrist_L': 'lHand',
-             'FingerThumb1_L': 'lThumb1',
-             'FingerThumb2_L': 'lThumb2',
-             'FingerThumb3_L': 'lThumb3',
-             'FingerThumbEnd_L': '',
-             'FingerIndex1_L': 'lIndex1',
-             'FingerIndex2_L': 'lIndex2',
-             'FingerIndex3_L': 'lIndex3',
-             'FingerIndexEnd_L': '',
-             'FingerMiddle1_L': 'lMid1',
-             'FingerMiddle2_L': 'lMid2',
-             'FingerMiddle3_L': 'lMid3',
-             'FingerMiddleEnd_L': '',
-             'FingerRing1_L': 'lRing1',
-             'FingerRing2_L': 'lRing2',
-             'FingerRing3_L': 'lRing3',
-             'FingerRingEnd_L': '',
-             'FingerPinky1_L': 'lPinky1',
-             'FingerPinky2_L': 'lPinky2',
-             'FingerPinky3_L': 'lPinky3',
-             'FingerPinkyEnd_L': '',
-             'Eye_L': 'lEye',
-             'EyeEnd_L': ''}
+             }
+
+TWIST_JNTS = [
+    'Shoulder_R',
+    'Elbow_R',
+    'Hip_R'
+]
+
+MANUAL_XFORMS = {
+    'HeadEnd_M': (0, 20, 0),
+    'BreastEnd_R': (-6.227, 4.643, 17.1455),
+    'HeelEnd_R': (1, -7, -6),
+    'ToesEnd_R': (-2, -1, 5),
+    'ButtockEnd_R': (-7, -11, -13)
+}
+
+
+class SkeletonMap(object):
+
+    def __init__(self):
+        self.map = JOINT_MAP
+        self.twist_joints = TWIST_JNTS
+        self.manual_xforms = MANUAL_XFORMS

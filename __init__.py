@@ -1,6 +1,5 @@
 import os
 import sys
-if not any(os.path.basename(p) for p in sys.path):
-    sys.path.append(os.path.dirname(__file__))
-from .skmapper import SkeletonMapper
+from .classes import SkeletonMapper
+from .skeletons import G8fMap
 from .main import execTransfer

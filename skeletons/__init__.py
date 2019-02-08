@@ -1,2 +1,1 @@
-from .base import BaseSkeleton
-from .daz import JOINT_MAP
+from .dazg8f import SkeletonMap as G8fMap

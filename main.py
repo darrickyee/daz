@@ -1,17 +1,7 @@
-import os
-import sys
 import pymel.core as pm
 from .core import TargetMesh
 from .figures import loadMeshes
-from .skeletons import BaseSkeleton, JOINT_MAP
 
-bs = BaseSkeleton()
-SKEL_HALF = bs.joint_names
-TREE_HALF = bs.joint_tree
-ORIENT_GRPS = bs.orient_grps
-WORLDORIENT_JNTS = bs.manual_orients
-TWIST_JNTS = bs.twist_joints
-MANUAL_XFORMS = bs.manual_xforms
 
 TGT_BODY = {
     'name': 'Body',
