@@ -150,5 +150,3 @@ class SkeletonMapper(object):
         orientJoint(joint, tgt, world_up=w_up, **kwargs)
 
         pm.delete(tgt)
-
-# A comment
