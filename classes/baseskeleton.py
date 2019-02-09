@@ -19,7 +19,7 @@ MANUAL_ORIENTS = {
     'Root_M': {},
     'COG_M': {'aim_offset': (0, 1, 0)},
     'Head_M': {'aim_offset': (0, 1, 0)},
-    'Ankle_R': {'aim_offset': (0, 1, 0), 'up_obj_name': 'Toes_R'},
+    'Ankle_R': {'aim_offset': (0, -1, 0), 'up_obj_name': 'Toes_R', 'up_vector': (0, -1, 0)},
     'Eye_R': {'aim_offset': (0, 0, 1)}
 }
 

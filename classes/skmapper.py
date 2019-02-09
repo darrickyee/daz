@@ -1,6 +1,6 @@
 import pymel.core as pm
 from .baseskeleton import BaseSkeleton
-from ..core.util import getPoleVector, orientJoint, getRootsInSet
+from ..core.util import getPoleVector, orientJoint, getRootsInSet, alignJointToVector
 
 
 class SkeletonMapper(object):
@@ -150,3 +150,27 @@ class SkeletonMapper(object):
         orientJoint(joint, tgt, world_up=w_up, **kwargs)
 
         pm.delete(tgt)
+
+    def poseHIK(self):
+
+        jnt_grps = {
+            'Arms': ['Clavicle', 'Shoulder', 'Elbow'],
+            'Legs': ['Hip', 'Knee', 'Ankle'],
+            'Wrist': ['Wrist']
+        }
+
+        axis_args = {
+            'Arms_R': [(-1, 0, 0), (0, 0, -1)],
+            'Arms_L': [(-1, 0, 0), (0, 0, 1)],
+            'Legs_R': [(0, -1, 0), (0, 0, -1)],
+            'Legs_L': [(0, 1, 0), (0, 0, 1)],
+            'Wrist_R': [(-1, 0, 0), (0, 1, 0)],
+            'Wrist_L': [(-1, 0, 0), (0, -1, 0)],
+        }
+
+        for grp in ['Arms', 'Legs', 'Wrist']:
+            for side in ['_R', '_L']:
+                joints = [self.joints[name+side] for name in jnt_grps[grp]]
+                axes = axis_args[grp + side]
+                for joint in joints:
+                    alignJointToVector(joint, *axes)

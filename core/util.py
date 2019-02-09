@@ -1,6 +1,29 @@
 import pymel.core as pm
 
 
+def alignJointToVector(joint, aim_x=(1, 0, 0), aim_y=(0, 1, 0)):
+    """
+    Rotates joint so that axes align with specified world-space directions.
+
+    Parameters
+    ----------
+    joint : pm.nt.Transform
+        Joint or transform to rotate.
+    aim_x : tuple, optional
+        World-space direction for the x-axis of `joint`.
+    aim_y : tuple, optional
+        World-space direction for the y-axis of `joint`.
+
+    """
+
+    aim_node = pm.createNode('transform')
+    aim_loc = aim_loc = joint.getTranslation(
+        space='world') + (t*10 for t in aim_x)
+    aim_node.setTranslation(aim_loc, space='world')
+
+    pm.delete(pm.aimConstraint(aim_node, joint, worldUpVector=aim_y), aim_node)
+
+
 def getRootsInSet(joints):
     return [joint for joint in joints if joint.getParent() not in joints]
 
