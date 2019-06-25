@@ -148,28 +148,3 @@ DRIVER_LIST = [
         'InvertAxis':True
     },
 ]
-
-md = {'JCM_ElbowFwd_135': {
-    'Driver': 'Elbow',
-    'Target': 'Wrist',
-    'Rotation': (0, 0, -135),
-    'Radius': 135,
-    'Keys': [(0.0, 0.0), (1.0, 1.0)],
-    'Mirror': True,
-    'InvertAxis': True
-},
-    'JCM_ShoulderDown_40': None,
-    'JCM_ShoulderFwd_110': None,
-    'JCM_NeckBack_27': None,
-    'JCM_KneeBend_90': None,
-    'JCM_HipFwd_115': None,
-    'JCM_HipFwd_57': None,
-    'JCM_ClavicleUp_55': None,
-    'JCM_ElbowFwd_75': None,
-    'JCM_NeckFwd_35': None,
-    'JCM_KneeBend_155': None,
-    'JCM_KneeCompress': None,
-    'JCM_ShoulderUp_90': None,
-    'JCM_HipBack_35': None,
-    'JCM_HipSide_85': None,
-    'JCM_JawOpen_25': None}
