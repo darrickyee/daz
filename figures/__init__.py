@@ -1,14 +1,12 @@
-from .g8f import FIGURES as G8F
-from .g8m import FIGURES as G8M
-from ..core import G8Mesh
-
-FIGURE_MAP = {
-    'g8f': G8F,
-    'g8m': G8M
-}
+from .g8f import FigureG8F
+from .g8m import FigureG8M
 
 
-def loadMeshes(name):
-    mesh_list = [G8Mesh(**figure_args)
-                 for figure_args in FIGURE_MAP[name.lower()]]
-    return mesh_list
+def getFigure(figure_type, body_file=None, head_file=None):
+
+    figure_class = {
+        'g8f': FigureG8F,
+        'g8m': FigureG8M
+    }
+
+    return figure_class[figure_type.lower()](body_file, head_file)

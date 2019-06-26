@@ -1,1 +1,0 @@
-from .skmapper import SkeletonMapper
