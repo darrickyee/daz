@@ -1,2 +1,2 @@
-from .dazmesh import G8Mesh
-from .target import TargetMesh
+from .dazmesh import buildDazMeshes
+from .util import duplicateClean, transferShapes
