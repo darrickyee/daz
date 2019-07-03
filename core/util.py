@@ -1,4 +1,5 @@
 import pymel.core as pm
+from ngSkinTools.importExport import JsonImporter
 
 
 def alignJointToVector(joint, aim_x=(1, 0, 0), aim_y=(0, 1, 0)):
@@ -31,7 +32,7 @@ def getRootsInSet(joints):
 def getPoleVector(start, mid, end):
     """
     Returns a unit pole vector for `start`, `mid`, and `end` transforms.
-    The pole vector is (parallel to) the vector orthogonal to the vector 
+    The pole vector is (parallel to) the vector orthogonal to the vector
     between `start` and `end` that passes through `mid`.
     (Note that `start` and `end` are interchangeable.)
 
@@ -152,3 +153,163 @@ def transferShapes(src_bsnode, tgt_node, tgt_prefix='_'):
         new_shapes.append(tgt_shape)
 
     return new_shapes
+
+
+def applyNgSkin(file_path, mesh):
+    with open(file_path) as f:
+        skin_str = ''.join(f.read().split())
+
+    ngs_importer = JsonImporter()
+    ngs_data = ngs_importer.process(skin_str)
+    ngs_data.saveTo(mesh.name())
+
+
+def createWtDriver(joint, target, rotation=(0, 0, 0), angle=None):
+
+    joint = pm.ls(joint)[0]
+    target = pm.ls(target)[0]
+
+    angle = angle or sum(rot**2 for rot in rotation)**(1.0/2)
+    invert = joint.name()[-2:] == '_L'
+
+    wtdrv = pm.createNode('weightDriver')
+    pm.rename(wtdrv.getParent(), 'wtDrv_{}1'.format(joint.name()))
+
+    pm.delete(pm.parentConstraint(joint, wtdrv.getParent()))
+
+    pm.rotate(wtdrv, rotation, os=True, r=True)
+
+    pm.parentConstraint(joint.getParent(),
+                        wtdrv.getParent(), mo=True)
+
+    # Connect matrices
+    wtdrv.getParent().worldMatrix[0].connect(wtdrv.readerMatrix)
+    target.worldMatrix[0].connect(wtdrv.driverMatrix)
+
+    # Set weightDriver attributes
+    wtdrv.angle.set(angle)
+    wtdrv.invert.set(invert)
+    wtdrv.blendCurve[0].blendCurve_Interp.set(1)
+
+    return wtdrv
+
+
+def attachWtDriverMorph(wt_driver, morph_attr, keys=((0.0, 0.0), (1.0, 1.0))):
+
+    wt_driver = pm.ls(wt_driver)[0]
+    morph_attr = pm.ls(morph_attr)[0]
+
+    rv_node = pm.createNode(
+        'remapValue', name='drv_{}'.format(morph_attr.getAlias()))
+
+    for i, key in enumerate(keys):
+        rv_node.value[i].value_Position.set(key[0])
+        rv_node.value[i].value_FloatValue.set(key[1])
+
+    wt_driver.outWeight.connect(rv_node.inputValue)
+    rv_node.outValue.connect(morph_attr)
+
+    return rv_node
+
+
+CHILD_JNTS = {
+    'Jaw': 'JawEnd',
+    'Neck': 'Head',
+    'Clavicle': 'Shoulder',
+    'Shoulder': 'Elbow',
+    'Elbow': 'Wrist',
+    'Hip': 'Knee',
+    'Knee': 'Ankle'
+}
+
+
+def buildWtDrivers(blend_shape, driver_data):
+    bs_node = pm.ls(blend_shape)[0]
+    bs_morph_list = [alias[0] for alias in bs_node.listAliases()]
+    wt_drv_list = list()
+
+    for base_morph in driver_data:
+        morphs = [
+            morph for morph in bs_morph_list if morph.startswith(base_morph)]
+
+        if morphs:
+            driver_args = driver_data[base_morph]
+
+            for morph in morphs:
+
+                if pm.ls('wtDrv_{}'.format(morph)):
+                    wt_drv = pm.ls('wtDrv_{}'.format(morph))[0].getShape()
+                else:
+                    side = morph[-2:] if morph[-2:] in ['_L', '_R'] else '_M'
+
+                    joint = driver_args['joint']
+                    target = CHILD_JNTS[joint] + side
+                    rotation = driver_args.get('rotation', None)
+                    angle = driver_args.get('angle', None)
+
+                    wt_drv = createWtDriver(
+                        joint+side, target, rotation, angle)
+                    pm.rename(wt_drv.getParent(), 'wtDrv_{}'.format(morph))
+
+                attachWtDriverMorph(wt_drv, '{0}.{1}'.format(
+                    bs_node.name(), morph), driver_args.get('keys', ((0.0, 0.0), (1.0, 1.0))))
+
+                wt_drv_list.append(wt_drv.getParent())
+
+    return wt_drv_list
+
+
+# def createWtDrivers(bs_node, morph_name, joint_base, rotation, radius=None, keys=((0.0, 0.0), (1.0, 1.0)), mirror=False, invert_axis=False):
+#     bs_node = pm.ls(bs_node_name)[0]
+
+#     radius = radius or sum(rot**2 for rot in rotation)**(1.0/2.0)
+
+#     if mirror:
+#         suffixes = ['_L', '_R']
+#     else:
+#         suffixes = ['_M']
+
+#     for suf in suffixes:
+#         m_suf = suf if mirror else ''
+#         if bs_node.hasAttr(morph_name+m_suf):
+#             morph = bs_node.attr(morph_name + m_suf)
+#         else:
+#             continue
+
+#         joint = pm.ls(joint_base + suf)[0]
+#         target = pm.ls(TARGET_MAP[joint_base]+suf)[0]
+
+#         if suf == '_R':
+#             inv = not invert_axis
+#         else:
+#             inv = invert_axis
+
+#         wd_node = pm.createNode(
+#             'weightDriver')
+#         pm.rename(wd_node.getParent(), 'wtDrv_' + morph.getAlias())
+
+#         pm.delete(pm.parentConstraint(joint, wd_node.getParent()))
+
+#         pm.rotate(wd_node, rotation, os=True, r=True)
+
+#         pm.parentConstraint(joint.getParent(),
+#                             wd_node.getParent(), mo=True)
+
+#         # Connect matrices
+#         wd_node.getParent().worldMatrix[0].connect(wd_node.readerMatrix)
+#         target.worldMatrix[0].connect(wd_node.driverMatrix)
+
+#         # Set weightDriver attributes
+#         wd_node.angle.set(radius)
+#         wd_node.invert.set(inv)
+#         wd_node.blendCurve[0].blendCurve_Interp.set(1)
+
+#         # Create remapValue nodes and set keys
+#         rv_node = pm.createNode(
+#             'remapValue', name='drv_' + morph.getAlias())
+#         for i, key in enumerate(keys):
+#             rv_node.value[i].value_Position.set(key[0])
+#             rv_node.value[i].value_FloatValue.set(key[1])
+
+#         wd_node.outWeight.connect(rv_node.inputValue)
+#         rv_node.outValue.connect(morph)
