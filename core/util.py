@@ -2,27 +2,28 @@ import pymel.core as pm
 from ngSkinTools.importExport import JsonImporter
 
 
-def alignJointToVector(joint, aim_x=(1, 0, 0), aim_y=(0, 1, 0)):
+def alignToVector(xform, aim_x=(1, 0, 0), aim_y=(0, 1, 0), freeze=False):
     """
-    Rotates joint so that axes align with specified world-space directions.
+    Rotates transform node so that axes align with specified world-space directions.
 
     Parameters
     ----------
-    joint : pm.nt.Transform
-        Joint or transform to rotate.
+    xform : pm.nt.Transform
+        Transform to rotate.
     aim_x : tuple, optional
-        World-space direction for the x-axis of `joint`.
+        World-space direction for the x-axis of `xform`.
     aim_y : tuple, optional
-        World-space direction for the y-axis of `joint`.
+        World-space direction for the y-axis of `xform`.
+    freeze : bool, optional
+        Freeze transformation if True. Default is False.
 
     """
 
     aim_node = pm.createNode('transform')
-    aim_loc = aim_loc = joint.getTranslation(
-        space='world') + (t*10 for t in aim_x)
-    aim_node.setTranslation(aim_loc, space='world')
+    aim_loc = xform.getTranslation(space='world') + (t*10 for t in aim_x)
+    pm.move(aim_node, aim_loc, ws=True)
 
-    pm.delete(pm.aimConstraint(aim_node, joint, worldUpVector=aim_y), aim_node)
+    pm.delete(pm.aimConstraint(aim_node, xform, worldUpVector=aim_y), aim_node)
 
 
 def getRootsInSet(joints):
@@ -54,7 +55,7 @@ def getPoleVector(start, mid, end):
     locs = [xform.getTranslation(space='world') for xform in [start, mid, end]]
     vec_basen = (locs[2] - locs[0]).normal()
     vec_mid = (locs[1] - locs[0])
-    pole_vec = (vec_mid - vec_mid.dot(vec_basen)*vec_basen).normal()
+    pole_vec = (vec_mid - vec_mid.dot(vec_basen)*vec_basen)
 
     return pole_vec
 

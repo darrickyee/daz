@@ -4,7 +4,7 @@ JOINT_MAP = {
     'Spine1_M': 'abdomenLower',
     'Spine2_M': 'abdomenUpper',
     'Spine3_M': 'chestLower',
-    'Chest_M': 'chestUpper',
+    'Spine4_M': 'chestUpper',
     'Neck_M': 'neckLower',
     'Head_M': 'head',
     'Jaw_M': 'lowerJaw',
