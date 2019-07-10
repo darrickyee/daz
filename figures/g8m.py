@@ -3,9 +3,8 @@ from .abstract import FigureData
 
 class FigureG8M(FigureData):
 
-    def __init__(self, body_file=None, head_file=None):
-        super(FigureG8M, self).__init__(
-            body_file=body_file, head_file=head_file)
+    def __init__(self, body_file, head_file):
+        super(FigureG8M, self).__init__({'Body': body_file, 'Head': head_file})
 
     @property
     def name(self):

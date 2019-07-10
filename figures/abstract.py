@@ -5,8 +5,8 @@ import pymel.core as pm
 class FigureData(object):
     __metaclass__ = ABCMeta
 
-    def __init__(self, body_file=None, head_file=None):
-        self.files = {'Body': body_file, 'Head': head_file}
+    def __init__(self, mesh_files):
+        self.files = mesh_files
         self._mesh = None
 
     @abstractproperty
@@ -28,6 +28,11 @@ class FigureData(object):
     @property
     def mesh(self):
         return self._mesh
+
+    def process(self):
+        self.moveUVs()
+        self.deleteFaces()
+        self.mergeMeshes()
 
     def moveUVs(self):
         for i, mesh_name in enumerate(self.mesh_names):
@@ -55,11 +60,5 @@ class FigureData(object):
 
     def mergeMeshes(self):
         self._mesh = pm.polyUnite(pm.ls(
-            (mesh_name+'FBXASC046Shape' for mesh_name in self.mesh_names), type='transform'),
-            n='Base', muv=1)[0]
+            (mesh_name+'FBXASC046Shape' for mesh_name in self.mesh_names), type='transform'), n='Base', muv=1)[0]
         pm.delete(self.mesh, ch=True)
-
-    def process(self):
-        self.moveUVs()
-        self.deleteFaces()
-        self.mergeMeshes()
