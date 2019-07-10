@@ -20,12 +20,17 @@ def buildDazMeshes():
     elif pm.ls('Genesis8Male'):
         figure = getFigure('g8m', **MESH_FILES_M)
     else:
-        raise MayaNodeError("Source mesh not found")
+        raise pm.MayaNodeError("Source mesh not found")
 
     # Unparent mesh and rescale blendshape targets
-    pm.delete(figure.name+'Genitalia')
+    if pm.ls(figure.name+'Genitalia'):
+        pm.delete(figure.name+'Genitalia')
+
+    # Unbind skins
     for shp in [mesh_name+'FBXASC046Shape' for mesh_name in figure.mesh_names]:
-        pm.ls(shp)[0].setParent(None)
+        pm.skinCluster(pm.ls(shp)[0], edit=True, unbind=True)
+
+    # Transfer scale from skeleton to blendshape target meshes
     tgt_scale = pm.ls(figure.name)[0].getScale()
     for shp in pm.ls((mesh_name+'__*' for mesh_name in figure.mesh_names), type='transform'):
         shp.setScale(tgt_scale)
