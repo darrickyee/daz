@@ -1,1 +1,1 @@
-from .core import buildDazMeshes, applySkins, duplicateClean, transferShapes
+from .core import buildDazMeshes, applySkins, duplicateClean, transferShapes, setupJoints, finishJoints

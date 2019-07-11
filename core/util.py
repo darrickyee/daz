@@ -25,6 +25,9 @@ def alignToVector(xform, aim_x=(1, 0, 0), aim_y=(0, 1, 0), freeze=False):
 
     pm.delete(pm.aimConstraint(aim_node, xform, worldUpVector=aim_y), aim_node)
 
+    if freeze:
+        pm.makeIdentity(xform, apply=True)
+
 
 def getRootsInSet(joints):
     return [joint for joint in joints if joint.getParent() not in joints]
@@ -60,9 +63,26 @@ def getPoleVector(start, mid, end):
     return pole_vec
 
 
-def orientJoint(joint, target, aim_vector=(1, 0, 0), up_vector=(0, 1, 0), world_up=(0, 1, 0)):
+def orientJoint(joint, aim_loc, aim_vector=(1, 0, 0), up_vector=(0, 1, 0), world_up=(0, 1, 0)):
+
+    children = joint.listRelatives()
+
+    if children:
+        for child in children:
+            child.setParent(None)
+
+    target = pm.createNode('transform')
+    target.setTranslation(aim_loc, ws=True)
+
     pm.delete(pm.aimConstraint(target, joint, aimVector=aim_vector,
                                upVector=up_vector, worldUpVector=world_up))
+
+    pm.delete(target)
+
+    if children:
+        for child in children:
+            child.setParent(joint)
+
     pm.makeIdentity(joint, apply=True)
 
 
