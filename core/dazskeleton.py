@@ -38,10 +38,10 @@ def finishJoints():
     matchCtrlTranslations()
 
     # Mirror joints
-    for jnt in 'Eye_R', 'BreastBase_R', 'ButtockBase_R':
+    for jnt in 'Eye_R', 'CTRLIKArm_R', 'CTRLIKLeg_R', 'CTRLPoleArm_R', 'CTRLPoleLeg_R':
         pm.mirrorJoint(jnt, searchReplace=('_R', '_L'))
 
-    for jnt in 'Clavicle_R', 'Hip_R', 'CTRLIKArm_R', 'CTRLIKLeg_R', 'CTRLPoleArm_R', 'CTRLPoleLeg_R':
+    for jnt in 'Clavicle_R', 'Hip_R', 'BreastBase_R', 'ButtockBase_R':
         pm.mirrorJoint(jnt, searchReplace=('_R', '_L'), mirrorBehavior=True)
 
 
