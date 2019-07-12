@@ -25,7 +25,7 @@ def setupJoints():
         matchTranslations(joint_map)
 
 
-def finishJoints():
+def buildJoints():
 
     orientSkeleton()
 
@@ -130,8 +130,6 @@ def orientSkeleton():
 
     for grp in jnt_grps:
         adjustOrientChain(pm.ls(grp))
-        # if '_R' in grp[0]:
-        #     adjustOrientChain(pm.ls([jnt[:-2]+'_L' for jnt in grp]))
 
     # Custom orient for Ankles
     jnt = pm.ls('Ankle_R')[0]
@@ -146,6 +144,16 @@ def orientSkeleton():
 
 
 def adjustOrient(joint, target):
+    """Adjusts the orientation of a joint by pointing the x-axis toward `target` while 
+    preserving its current up-axis as closely as possible.
+
+    Parameters
+    ----------
+    joint : pm.nt.Joint
+
+    target : pm.nt.Transform
+        Note: Only the translation of the transform node is used.
+    """
 
     inv_x = target.translateX.get() < 0
     x_axis = {
@@ -165,3 +173,26 @@ def adjustOrientChain(joint_list):
 
     for i, jnt in enumerate(joint_list[:-1]):
         adjustOrient(jnt, joint_list[i+1])
+
+
+def vecFromStr(in_vec):
+    """Returns an elementary vector based on `str` input ('x', 'y', or 'z', case-insensitive).
+
+    If input is not a `str`, the input is returned unmodified.
+
+    """
+
+    if isinstance(in_vec, str):
+
+        vec_dict = {
+            'x': (1, 0, 0),
+            'y': (0, 1, 0),
+            'z': (0, 0, 1)
+        }
+        try:
+            return vec_dict[in_vec.lower()]
+        except KeyError:
+            pm.warning('"{}" is not a valid vector name.'.format(in_vec))
+            return (0, 0, 0)
+
+    return in_vec
