@@ -161,7 +161,7 @@ def adjustOrient(joint, target):
         True: (-1, 0, 0)
     }
 
-    orientJoint(joint, target.getTranslation(ws=True), aim_vector=x_axis[inv_x],
+    orientJoint(joint, target.getTranslation(ws=True), aim_axis=x_axis[inv_x],
                 world_up=joint.getMatrix(ws=True)[1][:3])
 
 
@@ -173,26 +173,3 @@ def adjustOrientChain(joint_list):
 
     for i, jnt in enumerate(joint_list[:-1]):
         adjustOrient(jnt, joint_list[i+1])
-
-
-def vecFromStr(in_vec):
-    """Returns an elementary vector based on `str` input ('x', 'y', or 'z', case-insensitive).
-
-    If input is not a `str`, the input is returned unmodified.
-
-    """
-
-    if isinstance(in_vec, str):
-
-        vec_dict = {
-            'x': (1, 0, 0),
-            'y': (0, 1, 0),
-            'z': (0, 0, 1)
-        }
-        try:
-            return vec_dict[in_vec.lower()]
-        except KeyError:
-            pm.warning('"{}" is not a valid vector name.'.format(in_vec))
-            return (0, 0, 0)
-
-    return in_vec

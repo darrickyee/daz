@@ -4,7 +4,7 @@ from ngSkinTools.importExport import JsonImporter
 
 def alignToVector(xform, aim_x=(1, 0, 0), aim_y=(0, 1, 0), freeze=False):
     """
-    Rotates transform node so that axes align with specified world-space directions.
+    Rotates transform so that axes align with specified world-space directions.
 
     Parameters
     ----------
@@ -13,17 +13,26 @@ def alignToVector(xform, aim_x=(1, 0, 0), aim_y=(0, 1, 0), freeze=False):
     aim_x : tuple, optional
         World-space direction for the x-axis of `xform`.
     aim_y : tuple, optional
-        World-space direction for the y-axis of `xform`.
+        World-space direction for the y-axis of `xform`.  If not orthogonal to `aim_x`,
+        the y-axis will attempt to be as close as possible to this vector.
     freeze : bool, optional
         Freeze transformation if True. Default is False.
 
     """
 
-    aim_node = pm.createNode('transform')
-    aim_loc = xform.getTranslation(space='world') + (t*10 for t in aim_x)
-    pm.move(aim_node, aim_loc, ws=True)
+    xform = pm.ls(xform)[0]
 
-    pm.delete(pm.aimConstraint(aim_node, xform, worldUpVector=aim_y), aim_node)
+    xf_node = pm.createNode('transform')
+    pm.move(xf_node, xform.getTranslation(ws=True))
+
+    aim_node = pm.createNode('transform')
+    pm.move(aim_node, xform.getTranslation(space='world') + aim_x)
+
+    pm.delete(pm.aimConstraint(aim_node, xf_node,
+                               worldUpVector=aim_y), aim_node)
+
+    pm.rotate(xform, xf_node.getRotation(space='world'))
+    pm.delete(xf_node)
 
     if freeze:
         pm.makeIdentity(xform, apply=True)
@@ -55,6 +64,8 @@ def getPoleVector(start, mid, end):
 
     """
 
+    start, mid, end = (pm.ls(x)[0] for x in (start, mid, end))
+
     locs = [xform.getTranslation(space='world') for xform in [start, mid, end]]
     vec_basen = (locs[2] - locs[0]).normal()
     vec_mid = (locs[1] - locs[0])
@@ -63,7 +74,9 @@ def getPoleVector(start, mid, end):
     return pole_vec
 
 
-def orientJoint(joint, aim_loc, aim_vector=(1, 0, 0), up_vector=(0, 1, 0), world_up=(0, 1, 0)):
+def orientJoint(joint, aim_loc, aim_axis=(1, 0, 0), up_axis=(0, 1, 0), world_up=(0, 1, 0)):
+
+    joint = pm.ls(joint)[0]
 
     children = joint.listRelatives()
 
@@ -74,8 +87,8 @@ def orientJoint(joint, aim_loc, aim_vector=(1, 0, 0), up_vector=(0, 1, 0), world
     target = pm.createNode('transform')
     target.setTranslation(aim_loc, ws=True)
 
-    pm.delete(pm.aimConstraint(target, joint, aimVector=aim_vector,
-                               upVector=up_vector, worldUpVector=world_up))
+    pm.delete(pm.aimConstraint(target, joint, aimVector=aim_axis,
+                               upVector=up_axis, worldUpVector=world_up))
 
     pm.delete(target)
 
@@ -280,57 +293,24 @@ def buildWtDrivers(blend_shape, driver_data):
     return wt_drv_list
 
 
-# def createWtDrivers(bs_node, morph_name, joint_base, rotation, radius=None, keys=((0.0, 0.0), (1.0, 1.0)), mirror=False, invert_axis=False):
-#     bs_node = pm.ls(bs_node_name)[0]
+def vecFromStr(in_vec):
+    """Returns an elementary vector based on `str` input ('x', 'y', or 'z', case-insensitive).
 
-#     radius = radius or sum(rot**2 for rot in rotation)**(1.0/2.0)
+    If input is not a `str`, the input is returned unmodified.
 
-#     if mirror:
-#         suffixes = ['_L', '_R']
-#     else:
-#         suffixes = ['_M']
+    """
 
-#     for suf in suffixes:
-#         m_suf = suf if mirror else ''
-#         if bs_node.hasAttr(morph_name+m_suf):
-#             morph = bs_node.attr(morph_name + m_suf)
-#         else:
-#             continue
+    if isinstance(in_vec, str):
 
-#         joint = pm.ls(joint_base + suf)[0]
-#         target = pm.ls(TARGET_MAP[joint_base]+suf)[0]
+        vec_dict = {
+            'x': (1, 0, 0),
+            'y': (0, 1, 0),
+            'z': (0, 0, 1)
+        }
+        try:
+            return vec_dict[in_vec.lower()]
+        except KeyError:
+            pm.warning('"{}" is not a valid vector name.'.format(in_vec))
+            return (0, 0, 0)
 
-#         if suf == '_R':
-#             inv = not invert_axis
-#         else:
-#             inv = invert_axis
-
-#         wd_node = pm.createNode(
-#             'weightDriver')
-#         pm.rename(wd_node.getParent(), 'wtDrv_' + morph.getAlias())
-
-#         pm.delete(pm.parentConstraint(joint, wd_node.getParent()))
-
-#         pm.rotate(wd_node, rotation, os=True, r=True)
-
-#         pm.parentConstraint(joint.getParent(),
-#                             wd_node.getParent(), mo=True)
-
-#         # Connect matrices
-#         wd_node.getParent().worldMatrix[0].connect(wd_node.readerMatrix)
-#         target.worldMatrix[0].connect(wd_node.driverMatrix)
-
-#         # Set weightDriver attributes
-#         wd_node.angle.set(radius)
-#         wd_node.invert.set(inv)
-#         wd_node.blendCurve[0].blendCurve_Interp.set(1)
-
-#         # Create remapValue nodes and set keys
-#         rv_node = pm.createNode(
-#             'remapValue', name='drv_' + morph.getAlias())
-#         for i, key in enumerate(keys):
-#             rv_node.value[i].value_Position.set(key[0])
-#             rv_node.value[i].value_FloatValue.set(key[1])
-
-#         wd_node.outWeight.connect(rv_node.inputValue)
-#         rv_node.outValue.connect(morph)
+    return in_vec
