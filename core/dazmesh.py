@@ -54,7 +54,7 @@ def buildDazMeshes():
 
     # Clean up
     pm.delete(figure.name)
-    pm.delete('JCM*', 'POS*', 'Base')
+    pm.delete('JCM*', 'POS*', 'SHP*' 'Base')
     pm.mel.eval('cleanUpScene 3')
 
     pm.warning(
@@ -97,8 +97,8 @@ def buildMorphTargets(mesh_type, figure):
     pm.delete(tgt_mesh, ch=True)
 
     target_lists = {
-        'Head': pm.ls('POS_*', type='transform') + pm.ls(['JCM*' + limb + '*' for limb in ['Collar', 'Neck', 'Shldr']], type='transform'),
-        'Body': pm.ls('JCM_*', type='transform')
+        'Head': pm.ls(('POS_*', 'SHP_*'), type='transform') + pm.ls(['JCM*' + limb + '*' for limb in ['Collar', 'Neck', 'Shldr']], type='transform'),
+        'Body': pm.ls(('JCM_*', 'SHP_*'), type='transform')
     }
 
     for src_mesh in target_lists[mesh_type]:
@@ -111,7 +111,7 @@ def buildMorphTargets(mesh_type, figure):
 
 def renameShapes(figure_name):
     for shp in pm.ls(figure_name+'__*', type='transform'):
-        base_name = shp.name()[(len(figure_name)+2):]
+        base_name = shp.name().split('__')[1]
         pm.rename(shp, 'BODY_'+base_name)
         if pm.ls(figure_name+'Eyelashes__'+base_name):
             pm.rename(figure_name+'Eyelashes__' +
@@ -123,6 +123,8 @@ def renameShapes(figure_name):
 
         if 'eCTRL' in newmesh.name():
             pm.rename(newmesh, newmesh.name().replace('MERGED_eCTRL', 'POS_'))
+        elif 'CTRL' in newmesh.name():
+            pm.rename(newmesh, newmesh.name().replace('MERGED_CTRL', 'SHP_'))
         else:
             pm.rename(newmesh, newmesh.name().replace(
                 'pJCM', '').replace('MERGED_', 'JCM_'))

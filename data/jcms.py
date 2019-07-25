@@ -16,7 +16,7 @@ DRIVERS = {
         'keys': [(0.0, 0.0), (17.5/22.5, 1.0), (1.0, 1.0)]
     },
     'JCM_CollarUp_55': {
-        'joint': 'Clavicle',
+        'joint': 'Scapula',
         'rotation': (0, -55, 0),
     },
     'JCM_ShldrDown_40': {

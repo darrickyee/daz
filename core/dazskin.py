@@ -3,8 +3,8 @@ from .util import applyNgSkin, buildWtDrivers
 from ..data import DRIVERS
 
 SKIN_PATHS = {
-    'Head': 'C:/Users/DSY/Documents/Maya/projects/_UE4-Chars/data/G8F_HeadWeights.json',
-    'Body': 'C:/Users/DSY/Documents/Maya/projects/_UE4-Chars/data/G8F_BodyWeights.json'
+    'Head': 'C:/Users/DSY/Documents/Maya/projects/_UE4-Chars/data/G8F_HeadWeights_AS5.json',
+    'Body': 'C:/Users/DSY/Documents/Maya/projects/_UE4-Chars/data/G8F_BodyWeights_AS5.json'
 }
 
 

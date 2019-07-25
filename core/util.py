@@ -249,7 +249,7 @@ def attachWtDriverMorph(wt_driver, morph_attr, keys=((0.0, 0.0), (1.0, 1.0))):
 CHILD_JNTS = {
     'Jaw': 'JawEnd',
     'Neck': 'Head',
-    'Clavicle': 'Shoulder',
+    'Scapula': 'Shoulder',
     'Shoulder': 'Elbow',
     'Elbow': 'Wrist',
     'Hip': 'Knee',
@@ -291,26 +291,3 @@ def buildWtDrivers(blend_shape, driver_data):
                 wt_drv_list.append(wt_drv.getParent())
 
     return wt_drv_list
-
-
-def vecFromStr(in_vec):
-    """Returns an elementary vector based on `str` input ('x', 'y', or 'z', case-insensitive).
-
-    If input is not a `str`, the input is returned unmodified.
-
-    """
-
-    if isinstance(in_vec, str):
-
-        vec_dict = {
-            'x': (1, 0, 0),
-            'y': (0, 1, 0),
-            'z': (0, 0, 1)
-        }
-        try:
-            return vec_dict[in_vec.lower()]
-        except KeyError:
-            pm.warning('"{}" is not a valid vector name.'.format(in_vec))
-            return (0, 0, 0)
-
-    return in_vec
