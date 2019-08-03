@@ -54,7 +54,7 @@ def buildDazMeshes():
 
     # Clean up
     pm.delete(figure.name)
-    pm.delete('JCM*', 'POS*', 'SHP*' 'Base')
+    pm.delete(pm.ls('JCM*', 'POS*', 'SHP*', 'Base'))
     pm.mel.eval('cleanUpScene 3')
 
     pm.warning(

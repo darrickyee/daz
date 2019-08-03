@@ -31,7 +31,7 @@ def alignToVector(xform, aim_x=(1, 0, 0), aim_y=(0, 1, 0), freeze=False):
     pm.delete(pm.aimConstraint(aim_node, xf_node,
                                worldUpVector=aim_y), aim_node)
 
-    pm.rotate(xform, xf_node.getRotation(space='world'))
+    xform.setRotation(xf_node.getRotation(ws=True), ws=True)
     pm.delete(xf_node)
 
     if freeze:
