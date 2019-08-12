@@ -1,5 +1,3 @@
-import pymel.core as pm
-
 DRIVERS = {
     'POS_MouthOpen': {
         'joint': 'Jaw',
