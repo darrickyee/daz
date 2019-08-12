@@ -1,16 +1,50 @@
 import pymel.core as pm
 from ..figures import getFigure
-from .util import duplicateClean, transferShapes
+from .util import duplicateClean, transferShapes, invertBlendShapeWeights, setBlendShapeWeights
 
 MESH_FILES_F = {
-    'head_file': "C:/Users/DSY/Documents/Maya/projects/_UE4-Chars/scenes/Mesh/G8F_HeadBase.ma",
-    'body_file': "C:/Users/DSY/Documents/Maya/projects/_UE4-Chars/scenes/Mesh/G8F_BodyBase.ma"
+    'head_file': "C:/Users/DSY/Documents/Maya/projects/_UE4-Chars/assets/Chars/Geo/G8F_HeadBase.ma",
+    'body_file': "C:/Users/DSY/Documents/Maya/projects/_UE4-Chars/assets/Chars/Geo/G8F_BodyBase.ma"
 }
 
 MESH_FILES_M = {
-    'head_file': "C:/Users/DSY/Documents/Maya/projects/_UE4-Chars/scenes/Mesh/G8M_HeadBase.ma",
-    'body_file': "C:/Users/DSY/Documents/Maya/projects/_UE4-Chars/scenes/Mesh/G8M_BodyBase.ma"
+    'head_file': "C:/Users/DSY/Documents/Maya/projects/_UE4-Chars/assets/Chars/Geo/G8M_HeadBase.ma",
+    'body_file': "C:/Users/DSY/Documents/Maya/projects/_UE4-Chars/assets/Chars/Geo/G8M_BodyBase.ma"
 }
+
+
+def buildEyelidMorphTargets(morph_names=None):
+    morph_names = morph_names or (
+        'HeadGeo:POS_EyesClosedL', 'HeadGeo:POS_EyesClosedR')
+
+    # Create head with original eyelid blendshapes
+    head_mesh = duplicateClean('HeadGeo:Mesh', name='TMP_Head')
+    pm.select(morph_names, head_mesh)
+    bs_node = pm.blendShape(n='TMP_Morphs')[0]
+    wt_dict = dict(bs_node.listAliases())
+
+    # Start with Upper by setting lower vertex weights to 0
+    vtx_idx = pm.ls('HeadGeo:VtxEyelidsLower')[0].members()[0].indices()
+    setBlendShapeWeights(bs_node, indices=vtx_idx)
+
+    targets = list()
+
+    for morph in morph_names:
+        side = morph[-1]
+        morph_base = morph.split(':')[1]
+        wt_dict[morph_base].set(1)
+        targets.append(duplicateClean(head_mesh, name=morph[:-1]+'Upper'+side))
+
+        invertBlendShapeWeights(bs_node)
+
+        targets.append(duplicateClean(head_mesh, name=morph[:-1]+'Lower'+side))
+
+        wt_dict[morph_base].set(0)
+        invertBlendShapeWeights(bs_node)
+
+    pm.delete('TMP_Morphs', morph_names, head_mesh)
+    for target in targets:
+        target.setParent('HeadGeo:Morphs')
 
 
 def buildDazMeshes():
@@ -47,15 +81,30 @@ def buildDazMeshes():
         pm.delete(morph)
 
     # Build and group morph targets
-    for mtype in ['Head', 'Body']:
+    for mtype in 'Head', 'Body':
         buildMorphTargets(mtype, figure)
         pm.group([shp for shp in pm.ls(mtype+'Geo:*')
                   if 'Mesh' not in shp.name()], n=mtype+'Geo:Morphs')
+
+    buildEyelidMorphTargets()
 
     # Clean up
     pm.delete(figure.name)
     pm.delete(pm.ls('JCM*', 'POS*', 'SHP*', 'Base'))
     pm.mel.eval('cleanUpScene 3')
+
+    for mtype in 'Head', 'Body':
+        grp_node = pm.ls(mtype+'Geo:Morphs')[0]
+        grp_node.visibility.set(False)
+
+        # Sort morph nodes
+        names = [node.name()
+                 for node in grp_node.listRelatives(type='transform')]
+        names.sort()
+        for name in names:
+            node = pm.ls(name)[0]
+            node.setParent(None)
+            node.setParent(grp_node)
 
     pm.warning(
         'It may be necessary to average normals between Head and Body meshes.')
@@ -92,6 +141,7 @@ def buildMorphTargets(mesh_type, figure):
 
         pm.delete(tgt_mesh, ch=True)
 
+    # Transfer new figure shape to base geo
     pm.transferAttributes(
         figure.mesh, tgt_mesh, transferPositions=True, sampleSpace=3, targetUvSpace='UVOrig')
     pm.delete(tgt_mesh, ch=True)
@@ -101,6 +151,7 @@ def buildMorphTargets(mesh_type, figure):
         'Body': pm.ls(('JCM_*', 'SHP_*'), type='transform')
     }
 
+    # Create morph target meshes
     for src_mesh in target_lists[mesh_type]:
         new_mesh = duplicateClean(
             tgt_mesh, name=mesh_type+'Geo:'+src_mesh.name())

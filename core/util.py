@@ -2,6 +2,23 @@ import pymel.core as pm
 from ngSkinTools.importExport import JsonImporter
 
 
+def invertBlendShapeWeights(bs_node):
+    bs_node = pm.ls(bs_node)[0]
+    vtx_count = len(bs_node.getBaseObjects()[0].vtx)
+
+    for i in range(vtx_count):
+        weight = 1 - bs_node.inputTarget[0].baseWeights[i].get()
+        bs_node.inputTarget[0].baseWeights[i].set(weight)
+
+
+def setBlendShapeWeights(bs_node, indices=None, weight=0.0):
+    bs_node = pm.ls(bs_node)[0]
+    indices = indices or range(len(bs_node.getBaseObjects()[0].vtx))
+
+    for i in indices:
+        bs_node.inputTarget[0].baseWeights[i].set(weight)
+
+
 def alignToVector(xform, aim_x=(1, 0, 0), aim_y=(0, 1, 0), freeze=False):
     """
     Rotates transform so that axes align with specified world-space directions.
@@ -115,6 +132,8 @@ def duplicateClean(src_mesh, name=None):
     nt.Transform
         Transform node for duplicate mesh
     """
+
+    src_mesh = pm.ls(src_mesh)[0]
 
     new_name = name or src_mesh.nodeName()
 
@@ -263,8 +282,9 @@ def buildWtDrivers(blend_shape, driver_data):
     wt_drv_list = list()
 
     for base_morph in driver_data:
-        morphs = [
-            morph for morph in bs_morph_list if morph.startswith(base_morph)]
+        morphs = [morph
+                  for morph in bs_morph_list
+                  if morph.startswith(base_morph)]
 
         if morphs:
             driver_args = driver_data[base_morph]
@@ -284,6 +304,7 @@ def buildWtDrivers(blend_shape, driver_data):
                     wt_drv = createWtDriver(
                         joint+side, target, rotation, angle)
                     pm.rename(wt_drv.getParent(), 'wtDrv_{}'.format(morph))
+                    wt_drv.getParent().visibility.set(False)
 
                 attachWtDriverMorph(wt_drv, '{0}.{1}'.format(
                     bs_node.name(), morph), driver_args.get('keys', ((0.0, 0.0), (1.0, 1.0))))

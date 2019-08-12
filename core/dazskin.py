@@ -20,15 +20,18 @@ SKIN_PATHS = {
 
 def applySkins(figure=None):
     figure = figure or getFigureName()
-    for prefix, skin_path in SKIN_PATHS[figure].items():
-        applySkin(prefix, skin_path)
+    for ns_prefix, skin_path in SKIN_PATHS[figure].items():
+        applySkin(ns_prefix, skin_path)
+        addBlendShapes(ns_prefix+'Geo')
 
-    wtdrv_grp = pm.group([wtdrv.getParent() for wtdrv in pm.ls(
-        '*', type='weightDriver')], name='WeightDrivers_GRP')
-    pm.hide(wtdrv_grp)
+    applyShaders()
 
-    pm.importFile(
-        'C:/Users/DSY/Documents/Maya/projects/_UE4-Chars/assets/G8_MATS.ma')
+    # Hide weightDrivers and group under appropriate group
+    wtdrv_grp = pm.createNode('transform', n='WeightDriverSystem')
+    for node in (wtdrv.getParent() for wtdrv in pm.ls('*', type='weightDriver')):
+        node.setParent(wtdrv_grp)
+    wtdrv_grp.visibility.set(False)
+    wtdrv_grp.setParent('Main')
 
 
 def applySkin(ns_prefix, skindata_path):
@@ -48,6 +51,30 @@ def applySkin(ns_prefix, skindata_path):
 
     # Apply weight drivers
     buildWtDrivers(blend_shape, driver_data=DRIVERS)
+
+
+def applyShaders(shader_file='C:/Users/DSY/Documents/Maya/projects/_UE4-Chars/assets/G8_MATS.ma'):
+
+    if not pm.ls('MAT_Skin'):
+        pm.importFile(shader_file)
+
+    shader_map = {
+        'MAT_Skin': pm.ls('Mesh', recursive=True),
+        'MAT_Eyelash': pm.ls('FacEyelash', recursive=True)[0].members(),
+        'MAT_EyeSurf': pm.ls('FacEyeSurf', recursive=True)[0].members()
+    }
+
+    for shader, faces in shader_map.items():
+        pm.select(faces)
+        pm.hyperShade(assign=shader)
+
+
+def addBlendShapes(name_space):
+    pm.select(pm.ls('{}:Morphs'.format(name_space))
+              [0].listRelatives(), r=True)
+    pm.select('{}:Mesh'.format(name_space), add=True)
+    return pm.blendShape(frontOfChain=1, n='Morphs{}'.format(
+        name_space.replace('Geo', '')))
 
 
 def getFigureName():

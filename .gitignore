@@ -1,0 +1,4 @@
+.vscode
+!.env
+*.py[cod]
+scratch.*
