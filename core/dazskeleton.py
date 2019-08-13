@@ -3,6 +3,16 @@ from ..data import getJointMap
 from .util import getPoleVector, orientJoint
 
 
+# Attempt auto-move
+# 'VtxBreastMid_R' VtxBreastEnd_R etc.
+
+def getAverageLoc(node_list):
+    locs = [pm.datatypes.Vector(pm.xform(node, query=True, t=True))
+            for node in node_list]
+
+    return sum(locs)/len(locs)
+
+
 def setupJoints():
 
     pm.delete(
