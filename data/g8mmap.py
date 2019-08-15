@@ -1,5 +1,5 @@
 JOINT_MAP = {
-    'COG_M': 'hip',
+    'COM_M': 'hip',
     'Pelvis_M': 'pelvis',
     'Spine1_M': 'abdomenLower',
     'Spine2_M': 'abdomenUpper',
@@ -18,7 +18,7 @@ JOINT_MAP = {
     'Ankle_R': 'rFoot',
     'Toes_R': 'rToe',
     'BreastBase_R': 'rPectoral',
-    'Clavicle_R': 'rCollar',
+    'Collar_R': 'rCollar',
     'Shoulder_R': 'rShldrBend',
     'Elbow_R': 'rForearmBend',
     'Wrist_R': 'rHand',

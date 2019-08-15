@@ -22,7 +22,8 @@ def applySkins(figure=None):
     figure = figure or getFigureName()
     for ns_prefix, skin_path in SKIN_PATHS[figure].items():
         applySkin(ns_prefix, skin_path)
-        addBlendShapes(ns_prefix+'Geo')
+        bs_node = addBlendShapes(ns_prefix+'Geo')
+        buildWtDrivers(bs_node, driver_data=DRIVERS)
 
     applyShaders()
 
@@ -43,15 +44,6 @@ def applySkin(ns_prefix, skindata_path):
     # Load weights
     applyNgSkin(skindata_path, pm.ls(mesh_name)[0])
 
-    # Add blendshapes
-    shapes = pm.listRelatives(
-        '{}Geo:Morphs'.format(ns_prefix)) + pm.ls(mesh_name)
-    blend_shape = pm.blendShape(
-        shapes, n='Morphs{}'.format(ns_prefix), foc=True)
-
-    # Apply weight drivers
-    buildWtDrivers(blend_shape, driver_data=DRIVERS)
-
 
 def applyShaders(shader_file='C:/Users/DSY/Documents/Maya/projects/_UE4-Chars/assets/G8_MATS.ma'):
 
@@ -70,11 +62,13 @@ def applyShaders(shader_file='C:/Users/DSY/Documents/Maya/projects/_UE4-Chars/as
 
 
 def addBlendShapes(name_space):
-    pm.select(pm.ls('{}:Morphs'.format(name_space))
-              [0].listRelatives(), r=True)
-    pm.select('{}:Mesh'.format(name_space), add=True)
-    return pm.blendShape(frontOfChain=1, n='Morphs{}'.format(
-        name_space.replace('Geo', '')))
+    body_part = name_space.replace('Geo', '')
+    if not pm.ls('Morphs'+body_part+'*', type='blendShape'):
+        pm.select(pm.ls('{}:Morphs'.format(name_space))
+                  [0].listRelatives(), r=True)
+        pm.select('{}:Mesh'.format(name_space), add=True)
+        return pm.blendShape(frontOfChain=1, n='Morphs{}'.format(
+            name_space.replace('Geo', '')))[0]
 
 
 def getFigureName():

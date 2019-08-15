@@ -13,7 +13,71 @@ MESH_FILES_M = {
 }
 
 
-def buildEyelidMorphTargets(morph_names=None):
+def buildDazMeshes():
+
+    if pm.ls('Genesis8Female'):
+        figure = getFigure('g8f', **MESH_FILES_F)
+    elif pm.ls('Genesis8Male'):
+        figure = getFigure('g8m', **MESH_FILES_M)
+    else:
+        raise pm.MayaNodeError("Source mesh not found")
+
+    # Delete unneeded skeleton/mesh
+    if pm.ls(figure.name+'Genitalia'):
+        pm.delete(figure.name+'Genitalia')
+
+    # Unbind skins
+    for shp in (mesh_name+'FBXASC046Shape' for mesh_name in figure.mesh_names):
+        pm.skinCluster(pm.ls(shp)[0], edit=True, unbind=True)
+
+    # Transfer scale from skeleton to blendshape target meshes
+    tgt_scale = pm.ls(figure.name)[0].getScale()
+    for shp in pm.ls((mesh_name+'__*' for mesh_name in figure.mesh_names), type='transform'):
+        shp.setScale(tgt_scale)
+        pm.makeIdentity(shp, apply=True)
+
+    # Move UVs, delete faces, merge base & eyelash meshes, delete history
+    figure.process()
+
+    # Rename shapes
+    _renameShapes(figure.name)
+
+    # Delete unneeded morphs
+    for morph in pm.ls(['*PuckerWide', '*Pucker_*', '*OpenLips*'], type='transform'):
+        pm.delete(morph)
+
+    # Build and group morph targets
+    for mtype in 'Head', 'Body':
+        _buildMorphTargets(mtype, figure)
+        pm.group([shp for shp in pm.ls(mtype+'Geo:*')
+                  if 'Mesh' not in shp.name()], n=mtype+'Geo:Morphs')
+
+    _buildEyelidMorphTargets()
+
+    # Clean up
+    # pm.delete(figure.name)
+    pm.delete(pm.ls('JCM*', 'POS*', 'SHP*', 'Base'))
+    pm.mel.eval('cleanUpScene 3')
+
+    # Group, sort, hide morph shapes
+    for mtype in 'Head', 'Body':
+        grp_node = pm.ls(mtype+'Geo:Morphs')[0]
+        grp_node.visibility.set(False)
+
+        # Sort morph nodes
+        names = [node.name()
+                 for node in grp_node.listRelatives(type='transform')]
+        names.sort()
+        for name in names:
+            node = pm.ls(name)[0]
+            node.setParent(None)
+            node.setParent(grp_node)
+
+    pm.warning(
+        'It may be necessary to average normals between Head and Body meshes.')
+
+
+def _buildEyelidMorphTargets(morph_names=None):
     morph_names = morph_names or (
         'HeadGeo:POS_EyesClosedL', 'HeadGeo:POS_EyesClosedR')
 
@@ -35,7 +99,12 @@ def buildEyelidMorphTargets(morph_names=None):
         wt_dict[morph_base].set(1)
         targets.append(duplicateClean(head_mesh, name=morph[:-1]+'Upper'+side))
 
-        invertBlendShapeWeights(bs_node)
+        # Invert weights
+        all_weights = (bs_node.inputTarget[0].baseWeights[i]
+                       for i in range(len(bs_node.getBaseObjects()[0].vtx)))
+        for weight in all_weights:
+            weight.set(0)
+        setBlendShapeWeights(bs_node, indices=vtx_idx, weight=1.0)
 
         targets.append(duplicateClean(head_mesh, name=morph[:-1]+'Lower'+side))
 
@@ -47,70 +116,7 @@ def buildEyelidMorphTargets(morph_names=None):
         target.setParent('HeadGeo:Morphs')
 
 
-def buildDazMeshes():
-
-    if pm.ls('Genesis8Female'):
-        figure = getFigure('g8f', **MESH_FILES_F)
-    elif pm.ls('Genesis8Male'):
-        figure = getFigure('g8m', **MESH_FILES_M)
-    else:
-        raise pm.MayaNodeError("Source mesh not found")
-
-    # Unparent mesh and rescale blendshape targets
-    if pm.ls(figure.name+'Genitalia'):
-        pm.delete(figure.name+'Genitalia')
-
-    # Unbind skins
-    for shp in [mesh_name+'FBXASC046Shape' for mesh_name in figure.mesh_names]:
-        pm.skinCluster(pm.ls(shp)[0], edit=True, unbind=True)
-
-    # Transfer scale from skeleton to blendshape target meshes
-    tgt_scale = pm.ls(figure.name)[0].getScale()
-    for shp in pm.ls((mesh_name+'__*' for mesh_name in figure.mesh_names), type='transform'):
-        shp.setScale(tgt_scale)
-        pm.makeIdentity(shp, apply=True)
-
-    # Move UVs, delete faces, merge base & eyelash meshes, delete history
-    figure.process()
-
-    # Rename shapes
-    renameShapes(figure.name)
-
-    # Delete unneeded morphs
-    for morph in pm.ls(['*PuckerWide', '*Pucker_*', '*OpenLips*'], type='transform'):
-        pm.delete(morph)
-
-    # Build and group morph targets
-    for mtype in 'Head', 'Body':
-        buildMorphTargets(mtype, figure)
-        pm.group([shp for shp in pm.ls(mtype+'Geo:*')
-                  if 'Mesh' not in shp.name()], n=mtype+'Geo:Morphs')
-
-    buildEyelidMorphTargets()
-
-    # Clean up
-    pm.delete(figure.name)
-    pm.delete(pm.ls('JCM*', 'POS*', 'SHP*', 'Base'))
-    pm.mel.eval('cleanUpScene 3')
-
-    for mtype in 'Head', 'Body':
-        grp_node = pm.ls(mtype+'Geo:Morphs')[0]
-        grp_node.visibility.set(False)
-
-        # Sort morph nodes
-        names = [node.name()
-                 for node in grp_node.listRelatives(type='transform')]
-        names.sort()
-        for name in names:
-            node = pm.ls(name)[0]
-            node.setParent(None)
-            node.setParent(grp_node)
-
-    pm.warning(
-        'It may be necessary to average normals between Head and Body meshes.')
-
-
-def buildMorphTargets(mesh_type, figure):
+def _buildMorphTargets(mesh_type, figure):
     pm.importFile(figure.files[mesh_type], namespace=mesh_type+'Geo')
     tgt_mesh = pm.ls(mesh_type+'Geo:Mesh')[0]
 
@@ -160,7 +166,7 @@ def buildMorphTargets(mesh_type, figure):
         pm.delete(new_mesh, ch=True)
 
 
-def renameShapes(figure_name):
+def _renameShapes(figure_name):
     for shp in pm.ls(figure_name+'__*', type='transform'):
         base_name = shp.name().split('__')[1]
         pm.rename(shp, 'BODY_'+base_name)
@@ -179,3 +185,6 @@ def renameShapes(figure_name):
         else:
             pm.rename(newmesh, newmesh.name().replace(
                 'pJCM', '').replace('MERGED_', 'JCM_'))
+
+
+def convertToHiPoly(save_file):

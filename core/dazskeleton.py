@@ -2,9 +2,13 @@ import pymel.core as pm
 from ..data import getJointMap
 from .util import getPoleVector, orientJoint
 
+SKEL_FILES = {
+    'g8f': 'C:/Users/DSY/Documents/Maya/projects/_UE4-Chars/assets/Chars/Skel/SK_G8F.ma'
+}
 
 # Attempt auto-move
 # 'VtxBreastMid_R' VtxBreastEnd_R etc.
+
 
 def getAverageLoc(node_list):
     locs = [pm.datatypes.Vector(pm.xform(node, query=True, t=True))

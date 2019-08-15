@@ -2,6 +2,19 @@ import pymel.core as pm
 from ngSkinTools.importExport import JsonImporter
 
 
+def getFigureName():
+    fig_names = {
+        'Genesis8Female': 'g8f',
+        'Genesis8Male': 'g8m'
+    }
+
+    for figure, name in fig_names.items():
+        if pm.ls(figure):
+            return name
+
+    raise ValueError('No figure found in scene.')
+
+
 def invertBlendShapeWeights(bs_node):
     bs_node = pm.ls(bs_node)[0]
     vtx_count = len(bs_node.getBaseObjects()[0].vtx)
