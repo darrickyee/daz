@@ -185,6 +185,3 @@ def _renameShapes(figure_name):
         else:
             pm.rename(newmesh, newmesh.name().replace(
                 'pJCM', '').replace('MERGED_', 'JCM_'))
-
-
-def convertToHiPoly(save_file):

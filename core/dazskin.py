@@ -12,8 +12,8 @@ SKIN_PATHS = {
         'Body': 'C:/Users/DSY/Documents/Maya/projects/_UE4-Chars/data/G8M_BodyWeights.json'
     },
     'g8fhi': {
-        'Head': 'C:/Users/DSY/Documents/Maya/projects/_UE4-Chars/data/G8F_HeadWeights_AS5.json',
-        'Body': 'C:/Users/DSY/Documents/Maya/projects/_UE4-Chars/data/G8F_BodyWeights_AS5.json'
+        'Head': 'C:/Users/DSY/Documents/Maya/projects/_UE4-Chars/data/G8FHi_HeadWeights_AS5.json',
+        'Body': 'C:/Users/DSY/Documents/Maya/projects/_UE4-Chars/data/G8FHi_BodyWeights_AS5.json'
     }
 }
 
