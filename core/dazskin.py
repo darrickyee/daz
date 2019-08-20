@@ -32,7 +32,10 @@ def applySkins(figure=None):
     for node in (wtdrv.getParent() for wtdrv in pm.ls('*', type='weightDriver')):
         node.setParent(wtdrv_grp)
     wtdrv_grp.visibility.set(False)
-    wtdrv_grp.setParent('Main')
+    if pm.ls('Main'):
+        wtdrv_grp.setParent('Main')
+    else:
+        pm.group(wtdrv_grp, n='Main')
 
 
 def applySkin(ns_prefix, skindata_path):
@@ -76,7 +79,10 @@ def getFigureName():
     if pm.ls('TestesBase_M'):
         return 'g8m'
 
-    if len(pm.ls('HeadGeo:Mesh')[0].vtx) > 7000:
-        return 'g8fhi'
+    if pm.ls('HeadGeo:Mesh'):
+        if len(pm.ls('HeadGeo:Mesh')[0].vtx) > 7000:
+            return 'g8fhi'
 
-    return 'g8f'
+        return 'g8f'
+
+    raise pm.MayaNodeError('No DAZ figure found.')

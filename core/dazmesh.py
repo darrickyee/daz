@@ -21,6 +21,7 @@ def buildDazMeshes():
         figure = getFigure('g8m', **MESH_FILES_M)
     else:
         raise pm.MayaNodeError("Source mesh not found")
+    print("Processing figure '{}':".format(figure.name))
 
     # Delete unneeded skeleton/mesh
     if pm.ls(figure.name+'Genitalia'):
@@ -47,15 +48,18 @@ def buildDazMeshes():
         pm.delete(morph)
 
     # Build and group morph targets
+    print('Building morph targets...')
     for mtype in 'Head', 'Body':
         _buildMorphTargets(mtype, figure)
         pm.group([shp for shp in pm.ls(mtype+'Geo:*')
                   if 'Mesh' not in shp.name()], n=mtype+'Geo:Morphs')
 
+    print('Editing Eyelid morphs.  Please wait...')
     _buildEyelidMorphTargets()
 
     # Clean up
     # pm.delete(figure.name)
+    print('Cleaning up...')
     pm.delete(pm.ls('JCM*', 'POS*', 'SHP*', 'Base'))
     pm.mel.eval('cleanUpScene 3')
 
