@@ -3,13 +3,13 @@ from ..figures import getFigure
 from .util import duplicateClean, transferShapes, invertBlendShapeWeights, setBlendShapeWeights
 
 MESH_FILES_F = {
-    'head_file': "C:/Users/DSY/Documents/Maya/projects/_UE4-Chars/assets/Chars/Geo/G8F_HeadBase.ma",
-    'body_file': "C:/Users/DSY/Documents/Maya/projects/_UE4-Chars/assets/Chars/Geo/G8F_BodyBase.ma"
+    'head_file': "C:/Users/Darrick/Documents/Maya/projects/_UE4-Chars/assets/Chars/Geo/G8F_HeadBase.ma",
+    'body_file': "C:/Users/Darrick/Documents/Maya/projects/_UE4-Chars/assets/Chars/Geo/G8F_BodyBase.ma"
 }
 
 MESH_FILES_M = {
-    'head_file': "C:/Users/DSY/Documents/Maya/projects/_UE4-Chars/assets/Chars/Geo/G8M_HeadBase.ma",
-    'body_file': "C:/Users/DSY/Documents/Maya/projects/_UE4-Chars/assets/Chars/Geo/G8M_BodyBase.ma"
+    'head_file': "C:/Users/Darrick/Documents/Maya/projects/_UE4-Chars/assets/Chars/Geo/G8M_HeadBase.ma",
+    'body_file': "C:/Users/Darrick/Documents/Maya/projects/_UE4-Chars/assets/Chars/Geo/G8M_BodyBase.ma"
 }
 
 

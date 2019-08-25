@@ -3,7 +3,7 @@ from ..data import getJointMap
 from .util import getPoleVector, orientJoint
 
 SKEL_FILES = {
-    'g8f': 'C:/Users/DSY/Documents/Maya/projects/_UE4-Chars/assets/Chars/Skel/SK_G8F.ma'
+    'g8f': 'C:/Users/Darrick/Documents/Maya/projects/_UE4-Chars/assets/Chars/Skel/SK_G8F.ma'
 }
 
 # Attempt auto-move

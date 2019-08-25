@@ -1,6 +1,6 @@
 import os
 
-in_file = 'C:/Users/DSY/Documents/maya/projects/_UE4-Chars/scenes/Rig/dev_g8fpc2.ma'
+in_file = 'C:/Users/Darrick/Documents/maya/projects/_UE4-Chars/scenes/Rig/dev_g8fpc2.ma'
 
 with open(in_file, mode='r') as f:
     tmp_file = in_file+'_TMP'
@@ -43,3 +43,7 @@ heelxf.setTranslation(heelxf.translate.get().normal()
                         * (heelxf.translate.get().length()+.5))
 
 toevtx = pm.ls('BodyGeo:Mesh.vtx[8881]')[0]
+
+
+#%%
+import pandas as pd

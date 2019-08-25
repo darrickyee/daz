@@ -4,7 +4,7 @@ from .core.util import getFigureName
 from . import buildDazMeshes, applySkins
 
 
-def rigDazFigure(name, path='C:/Users/DSY/Documents/Maya/projects/_UE4-Chars/scenes'):
+def rigDazFigure(name, path='C:/Users/Darrick/Documents/Maya/projects/_UE4-Chars/scenes'):
     """Need to load DAZ FBX first"""
 
     figure = getFigureName()
@@ -44,7 +44,7 @@ def rigDazFigure(name, path='C:/Users/DSY/Documents/Maya/projects/_UE4-Chars/sce
     # Build AS5 rig
     print('Building AS5 rig...')
     pm.mel.eval(
-        'source "C:/Users/DSY/Documents/Maya/scripts/AdvancedSkeleton5.mel";')
+        'source "C:/Users/Darrick/Documents/Maya/scripts/AdvancedSkeleton5.mel";')
     pm.mel.eval('asBuildAdvancedSkeleton();')
 
     print('Executing post-build script...')
@@ -95,7 +95,7 @@ FIGURE_EDGES = {
 }
 
 
-def convertSmoothSkin(name, path='C:/Users/DSY/Documents/Maya/projects/_UE4-Chars/scenes'):
+def convertSmoothSkin(name, path='C:/Users/Darrick/Documents/Maya/projects/_UE4-Chars/scenes'):
 
     pm.newFile(force=True)
     pm.importFile(path+'/Mesh/Ref/Mesh_'+name+'.ma')
