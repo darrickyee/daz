@@ -184,8 +184,10 @@ def _renameShapes(figure_name):
 
         if 'eCTRL' in newmesh.name():
             pm.rename(newmesh, newmesh.name().replace('MERGED_eCTRL', 'POS_'))
-        elif 'CTRL' in newmesh.name():
-            pm.rename(newmesh, newmesh.name().replace('MERGED_CTRL', 'SHP_'))
-        else:
+        # elif 'CTRL' in newmesh.name():
+        #     pm.rename(newmesh, newmesh.name().replace('MERGED_CTRL', 'SHP_'))
+        elif 'pJCM' in newmesh.name():
             pm.rename(newmesh, newmesh.name().replace(
                 'pJCM', '').replace('MERGED_', 'JCM_'))
+        else:
+            pm.rename(newmesh, newmesh.name().replace('MERGED_CTRL', 'SHP_').replace('MERGED_', 'SHP_'))
